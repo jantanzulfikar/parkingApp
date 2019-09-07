@@ -9,7 +9,7 @@ run setup.bat for build java class
 
 run parking_lot.bat for start application
 
-run run_functional_tests.bat for testing application 
+run functional_tests.bat for testing application 
 -test script get testingScript.txt under bin folder
 
 
