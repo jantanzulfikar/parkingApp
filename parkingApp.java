@@ -1,11 +1,26 @@
 
 import java.util.Scanner; 
+import org.junit.*;
+import org.junit.runner.JUnitCore;      
+import org.junit.runner.Result;     
+import org.junit.runner.notification.Failure;
+
 
 public class parkingApp {
 	
 	public static String [] parks = {};
 
 	public static void main (String [] Args) {
+		
+		
+		Result result = JUnitCore.runClasses(FirstUnitTest.class);                  
+            for (Failure failure : result.getFailures()) {                          
+         System.out.println(failure.toString());                    
+      }      
+      System.out.println("Result=="+result.wasSuccessful()); 
+		
+		
+		
 		System.out.println("WELCOME TO GOJEK PARKING APPS!");		
 		Scanner in = new Scanner(System.in);
 		System.out.println("Please choose type of input : ");
