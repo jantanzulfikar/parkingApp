@@ -1,27 +1,15 @@
 
 import java.util.Scanner; 
-import org.junit.*;
-import org.junit.runner.JUnitCore;      
-import org.junit.runner.Result;     
-import org.junit.runner.notification.Failure;
-
+import java.io.*;
 
 public class parkingApp {
 	
 	public static String [] parks = {};
+	public static int loot;
 
 	public static void main (String [] Args) {
-		
-		
-		Result result = JUnitCore.runClasses(FirstUnitTest.class);                  
-            for (Failure failure : result.getFailures()) {                          
-         System.out.println(failure.toString());                    
-      }      
-      System.out.println("Result=="+result.wasSuccessful()); 
-		
-		
-		
-		System.out.println("WELCOME TO GOJEK PARKING APPS!");		
+						
+		System.out.println("WELCOME TO  parkingAPP!");		
 		Scanner in = new Scanner(System.in);
 		System.out.println("Please choose type of input : ");
 		System.out.println("1 . input from txt ");
@@ -52,16 +40,66 @@ public class parkingApp {
 	public static void textType() {
 		
 		Scanner txtName = new Scanner(System.in);
-		System.out.print("Please input text file name : "); 
+		System.out.println("Example of directory : c:/user/file.txt"); 
+		System.out.println("Please input path and filename : "); 
 		String s = txtName.nextLine();         
 		System.out.print("Searching file : " + s); 
+		
+		try {
+			
+			
+		
+		File f = new File(s);
+		if(f.exists() && !f.isDirectory()) { 		
+		
+		BufferedReader r = new BufferedReader( new FileReader( s ) );
+		String result = "", line = null;
+			int i = 0; 
+			int loot = 0;
+			while ((line = r.readLine()) != null) {				
+				System.out.print(line);					
+				String [] scriptKey = line.split("\\s+");				
+				i++;
+						
+						if (scriptKey[0].equals("park")) {
+							startParking(loot , line , 1 );
+						} else if (scriptKey[0].equals("leave")) {
+							leaveParking(loot , line , 1);
+						} else if (scriptKey[0].equals("status")) {
+							checkStatus(loot , 1);							
+						} else if (scriptKey[0].equals("exit")) {
+							System.exit(0);
+						} else if (scriptKey[0].equals("registration_numbers_for_cars_with_colour") || scriptKey[0].equals("slot_numbers_for_cars_with_colour")) {
+							checkColor(loot , line , 1);
+						} else if (scriptKey[0].equals("slot_number_for_registration_number")) {
+							checkCarNumber(loot , line ,1);
+						} else if (scriptKey[0].equals("create_parking_lot")) {
+							loot = Integer.parseInt(scriptKey[1]);
+							parks = new String [loot];
+						} else {
+							System.out.println("script row : " + i + " not correct syntax");
+						}						
+			
+			}
+		
+			
+		
+		} else {
+			System.out.print("file not found");
+		}
+		
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
 		
 	}
 	
 	
 	public static void paramType(int loot) {
-		Scanner txtName = new Scanner(System.in);						
-		//System.out.println("parking lot : " + loot); 
+		Scanner txtName = new Scanner(System.in);								
 		System.out.println("===================List of parameter================="); 				
 		System.out.println("1.park space [car number] space [color] , this example of script :  park KA-01-HH-1234 White ");
 		System.out.println("2.leave space [park number] , this example of script :  leave 4  ");
@@ -93,24 +131,24 @@ public class parkingApp {
 		}
 				
 		if (scriptKey[0].equals("park")) {
-			startParking(loot , s);
+			startParking(loot , s , 2);
 		} else if (scriptKey[0].equals("leave")) {
-			leaveParking(loot , s);
+			leaveParking(loot , s , 2);
 		} else if (scriptKey[0].equals("status")) {
-			checkStatus(loot);							
+			checkStatus(loot , 2);							
 		} else if (scriptKey[0].equals("exit")) {
 			System.exit(0);
 		} else if (scriptKey[0].equals("registration_numbers_for_cars_with_colour") || scriptKey[0].equals("slot_numbers_for_cars_with_colour")) {
-			checkColor(loot , s);
+			checkColor(loot , s , 2);
 		} else if (scriptKey[0].equals("slot_number_for_registration_number")) {
-			checkCarNumber(loot , s);
+			checkCarNumber(loot , s , 2);
 		}
 					
 	}
 	
 	
 	
-	public static void checkCarNumber(int loot  , String param) {							
+	public static void checkCarNumber(int loot  , String param , int inputType) {							
 		String [] splitParam = param.split("\\s+");	
 		int	i = 0;	
 		for (String tempReport : parks) {						
@@ -122,45 +160,63 @@ public class parkingApp {
 			} 	
 		}	
 		
+		if (inputType == 2 ){
+			paramType(loot);	
+		}
 		
-		paramType(loot);	
+		
 		
 		
 	}
 	
-	public static void checkColor(int loot  , String param) {					
+	public static void checkColor(int loot  , String param , int inputType) {					
 		String alldata = "  ";		
 		String [] splitParam = param.split("\\s+");	
 		int	i = 0;	
 		for (String tempReport : parks) {						
-			i++;
+			if (tempReport == null) {
+				continue;
+			}
+			
+			i++;								
 			String [] splitData = tempReport.split("\\|");			
 			if (splitData[1].equals(splitParam[1]) && splitParam[0].equals("registration_numbers_for_cars_with_colour")) {
-				alldata = alldata + splitData[0];
+				alldata = alldata + splitData[0] + ",";
 			} else if (splitData[1].equals(splitParam[1]) && splitParam[0].equals("slot_numbers_for_cars_with_colour")){
 				alldata =  alldata + i + ",";
 			}			
 		}	
 		
 		System.out.println("data : " + alldata);
-		paramType(loot);	
+		
+		if (inputType == 2 ){
+			paramType(loot);	
+		}
 		
 		
 	}
 	
-	public static void checkStatus(int loot) {						
+	public static void checkStatus(int loot , int inputType) {						
 		System.out.printf("%-15s %15s  %15s %n", "Slot No.", "Registration No" , "Color");		
 		int i = 0;
 		for (String tempReport : parks) {
+			if (tempReport == null) {
+				continue;
+			}			
+			
+			
 			i++;
 			String [] split = tempReport.split("\\|");			
 			System.out.printf("%-15s %15s %15s %n", i , split[0] , split[1]);			
 		}			
-		paramType(loot);					
+		
+		if (inputType == 2 ){
+			paramType(loot);	
+		}
 	}
 	
 	
-	public static void leaveParking(int loot , String param) {		
+	public static void leaveParking(int loot , String param , int inputType) {		
 		String [] splitparam = param.split("\\s+");		
 		if (parks[Integer.parseInt(splitparam[1]) - 1 ] == null) {
 			System.out.println("Slot number "+ splitparam[1] +" is already free");
@@ -173,13 +229,16 @@ public class parkingApp {
 		}
 					
 		System.out.println("Slot number "+ splitparam[1] +" is free");
-		paramType(loot);
+		if (inputType == 2 ){
+			paramType(loot);	
+		}
 				
 		
 	}
 	
 	
-	public static void startParking(int loot , String param) {					
+	public static void startParking(int loot , String param , int inputType) {			
+		System.out.println("LOOT : " + loot);
 		String [] splitparam = param.split("\\s+");								
 		boolean isParkingFull = true;
 		for (int i = 0 ; i < parks.length ; i ++) {			
@@ -194,7 +253,9 @@ public class parkingApp {
 			System.out.println("Sorry, parking lot is full");
 		}
 		
-		paramType(loot);							
+		if (inputType == 2 ){
+			paramType(loot);	
+		}				
 		
 	}
 	
